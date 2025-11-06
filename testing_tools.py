@@ -44,7 +44,7 @@ def failed_case_message(expected_output, real_output, func_name, arg, arg_name=T
 def grade_code(func):
     import pickle 
     try: 
-        with open("testing_tools_sp/tests/" + func.__name__, "rb") as file:
+        with open("testing_tools_sp/tests/tests_" + func.__name__, "rb") as file:
             tests = pickle.load(file)
     except FileNotFoundError:
         return "El nombre de la función es inválido. Vuélvelo a intentar. "
