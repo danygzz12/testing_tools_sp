@@ -1,0 +1,78 @@
+def compare_returns(expected_output, real_output):
+    if real_output is None: 
+        return False
+    
+    # Handle complex numbers separately
+    if isinstance(expected_output, complex) or isinstance(real_output, complex):
+        return abs(expected_output - real_output) <= 1e-6
+    if isinstance(expected_output, float) or isinstance(real_output, float):
+        ### compare numbers with a tolerance level
+        from math import isclose
+        return isclose(expected_output, real_output, rel_tol=1e-6, abs_tol=1e-6)
+    if isinstance(expected_output, int) or isinstance(real_output, int):
+        return expected_output == real_output
+    if isinstance(expected_output, str):
+        return expected_output == real_output
+    if isinstance(expected_output, dict):
+        ### compare the keys: 
+        for key in expected_output:
+            if key not in real_output:
+                return False
+        for key in real_output:
+            if key not in expected_output:
+                return False 
+        for key in expected_output:
+            if expected_output[key] != real_output[key]:
+                return False
+        return True
+    if isinstance(expected_output, tuple): 
+        return expected_output == real_output
+    if isinstance(expected_output, list):
+        return expected_output == real_output
+    return expected_output == real_output
+
+
+
+def failed_case_message(expected_output, real_output, func_name, arg, arg_name=True):
+    if arg_name:
+        arg_text = [str(key)+"="+str(value) for key, value in arg.items()]
+    else:
+        arg_text = [str(value) for value in arg.values()]
+    arg_text = ", ".join(arg_text)
+    return f"\nAl llamar {func_name}({arg_text}) el resultado fue: \n{real_output} \nExpected: \n{expected_output} \n"
+
+def grade_code(func):
+    import pickle 
+    try: 
+        with open("testing_tools_sp/tests_" + func.__name__, "rb") as file:
+            tests = pickle.load(file)
+    except FileNotFoundError:
+        return "El nombre de la función es inválido. Vuélvelo a intentar. "
+    input_args = tests[1]
+    max_score = tests[2]
+
+    try: 
+        with open("testing_tools_sp/" + func.__name__, "rb") as file:
+            expected_results = pickle.load(file)
+    except FileNotFoundError:
+        return "El nombre de la función es inválido. Vuélvelo a intentar."
+    
+    passed_tests = 0
+    total_tests = 0
+    failed_messages = ""
+
+    for arg, expected_output in zip(input_args, expected_results): 
+        total_tests += 1
+        real_output = func(**arg)
+
+        passed = compare_returns(expected_output, real_output)
+
+        if passed:
+            passed_tests +=1 
+            continue 
+
+        failed_messages += failed_case_message(expected_output, real_output, func.__name__, arg)
+
+    score = passed_tests/total_tests*max_score
+    feedback = f"Pasaste {passed_tests}/{total_tests}.\nCalificación: {score}"+failed_messages
+    return feedback
