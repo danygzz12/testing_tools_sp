@@ -39,7 +39,7 @@ def failed_case_message(expected_output, real_output, func_name, arg, arg_name=T
     else:
         arg_text = [str(value) for value in arg.values()]
     arg_text = ", ".join(arg_text)
-    return f"\nAl llamar {func_name}({arg_text}) el resultado fue: \n{real_output} \nExpected: \n{expected_output} \n"
+    return f"\nAl llamar {func_name}({arg_text}) el resultado fue: \n{real_output} \nResultado esperado: \n{expected_output} \n"
 
 def grade_code(func):
     import pickle 
